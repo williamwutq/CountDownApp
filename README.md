@@ -24,6 +24,7 @@ The application supports the following command-line flags to customize the count
 | -d, --days      | Set target day (1-31)                            | `-d 31`                |
 | -dt, --date     | Set target date (YYYY-MM-DD)                     | `-dt 2026-01-01`       |
 | -a, --annotate  | Add annotation to window title                   | `-a "New Year"`        |
+| -r, --relative  | Set target time relative to current time         | `-r`                   |
 
 You can combine date and time flags to set a specific countdown target. If no flags are provided, the app displays the current time.
 

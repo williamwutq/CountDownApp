@@ -6,9 +6,11 @@ public class Main {
         // Try parse time target from args
         java.time.LocalDateTime targetTime = null;
         String titleAddition = null;
+        boolean relative = false;
         if (args.length > 0) {
             // Flags: -h, --hours, -m, --minutes, -s, --seconds, -t, --time (HH:MM:SS), -n, --midnight
             // Flags: -y, --years, -mo, --months, -d, --days, -dt, --date (YYYY-MM-DD), -a, --annotate
+            // Flags: -r, --relative
             int hours = -1, minutes = -1, seconds = -1;
             int years = -1, months = -1, days = -1;
             for (int i = 0; i < args.length; i++) {
@@ -115,6 +117,9 @@ public class Main {
                             return;
                         }
                     }
+                    case "-r", "--relative" -> {
+                        relative = true;
+                    }
                     default -> {
                         System.err.println("Error: Unknown argument " + args[i]);
                         return;
@@ -124,6 +129,29 @@ public class Main {
             // If all -1, set targetTime to null (show current time)
             if (hours == -1 && minutes == -1 && seconds == -1 && years == -1 && months == -1 && days == -1) {
                 targetTime = null;
+            }
+            // Relative time calculation
+            else if (relative) {
+                var nowDateTime = java.time.LocalDateTime.now();
+                targetTime = nowDateTime;
+                if (years != -1) {
+                    targetTime = targetTime.plusYears(years);
+                }
+                if (months != -1) {
+                    targetTime = targetTime.plusMonths(months);
+                }
+                if (days != -1) {
+                    targetTime = targetTime.plusDays(days);
+                }
+                if (hours != -1) {
+                    targetTime = targetTime.plusHours(hours);
+                }
+                if (minutes != -1) {
+                    targetTime = targetTime.plusMinutes(minutes);
+                }
+                if (seconds != -1) {
+                    targetTime = targetTime.plusSeconds(seconds);
+                }
             }
             // Calculate target time
             else {
