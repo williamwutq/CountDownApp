@@ -182,15 +182,16 @@ public class Main {
         }
         // System.out.println("Target Time: " + (targetTime != null ? targetTime.toString() : "Current Time Display"));
         // UI Setup
-        var backgroundColor = new Color(39, 39, 40);
-        var foregroundColor = new Color(154, 154, 154);
-        var minDimension = new Dimension(400, 100);
+        var backgroundColor = new Color(39, 39, 40);    // Customize background color here
+        var foregroundColor = new Color(154, 154, 154); // Customize foreground color here
+        var warningColor = new Color(255, 69, 0);       // Customize warning color here
+        var minDimension = new Dimension(400, 100);     // Customize minimum window size here
         var iconImage = fetchIconImage();
         var title = "COUNTDOWN" + (titleAddition != null ? " - " + titleAddition : "");
         var mainFrame = new JFrame(title){};
         var mainPanel = new JPanel();
         var mainLabel = new JLabel();
-        var fps = 120;
+        var fps = 120; // Customize FPS here
         mainLabel.setFont(generateFont(100));
         mainLabel.setForeground(foregroundColor);
         mainLabel.setVerticalTextPosition(JLabel.CENTER);
@@ -254,8 +255,13 @@ public class Main {
         sizeRecalculationListener.componentResized(null);
         // Event loop
         while (true) {
-            var currentTime = getFormattedTimeRemaining(targetTime);
-            mainLabel.setText(currentTime);
+            var timeResult = getFormattedTimeRemainingAndOver(targetTime);
+            mainLabel.setText(timeResult.display);
+            if (timeResult.isOver) {
+                mainLabel.setForeground(warningColor);
+            } else {
+                mainLabel.setForeground(foregroundColor);
+            }
             try {
                 Thread.sleep(1000 / fps);
             } catch (InterruptedException e) {
@@ -276,20 +282,41 @@ public class Main {
         var now = java.time.LocalTime.now();
         return String.format("%02d:%02d:%02d", now.getHour(), now.getMinute(), now.getSecond());
     }
-    private static String getFormattedTimeRemaining(java.time.LocalDateTime targetTime){
+
+    private static class TimeResult {
+        String display;
+        boolean isOver;
+        TimeResult(String display, boolean isOver) {
+            this.display = display;
+            this.isOver = isOver;
+        }
+    }
+
+    private static TimeResult getFormattedTimeRemainingAndOver(java.time.LocalDateTime targetTime){
         if (targetTime == null) {
-            return getFormattedTimeNow();
+            return new TimeResult(getFormattedTimeNow(), false);
         }
         var now = java.time.LocalDateTime.now();
         var duration = java.time.Duration.between(now, targetTime);
         long totalSeconds = duration.getSeconds();
-        if (totalSeconds < 0) totalSeconds = 0;
+        boolean isOver = false;
+        if (totalSeconds < 0) {
+            isOver = true;
+            totalSeconds = -totalSeconds;
+        }
         long days = totalSeconds / 86400; totalSeconds %= 86400;
         long hours = totalSeconds / 3600; totalSeconds %= 3600;
         long minutes = totalSeconds / 60;
         long seconds = totalSeconds % 60;
+        String formatted;
         if (days == 0) {
-            return String.format("%02d:%02d:%02d", hours, minutes, seconds);
-        } else return String.format("%02d:%02d:%02d:%02d", days, hours, minutes, seconds);
+            formatted = String.format("%02d:%02d:%02d", hours, minutes, seconds);
+        } else {
+            formatted = String.format("%02d:%02d:%02d:%02d", days, hours, minutes, seconds);
+        }
+        if (isOver) {
+            formatted = "+" + formatted;
+        }
+        return new TimeResult(formatted, isOver);
     }
 }
