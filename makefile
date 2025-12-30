@@ -17,6 +17,8 @@ midnight:
 	@$(PROGRAM) -n $(SEPARATE)
 
 # Minute countdowns (relative)
+timer1:
+	@$(PROGRAM) -r -m 1 $(SEPARATE)
 timer2:
 	@$(PROGRAM) -r -m 2 $(SEPARATE)
 timer3:
